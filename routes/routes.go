@@ -1,31 +1,32 @@
 package routes
 
 import (
-	"net/http"
-
 	"to-the-other-me/internal/handler"
+	"to-the-other-me/internal/middleware"
 
 	"github.com/gin-gonic/gin"
+
+	"os"
+
+	"github.com/gin-contrib/cors"
 )
+
 
 func RegisterRoutes(
 	router *gin.Engine,
 	geminiHandler *handler.GeminiHandler,
 	letterHandler *handler.LetterHandler,
 ) {
+	frontendURL := os.Getenv("FRONTEND_URL")
+	router.Use(cors.New(cors.Config{
+	AllowOrigins: []string{
+		frontendURL,
+	},
+	AllowMethods: []string{"GET", "POST","OPTIONS"},
+	AllowHeaders: []string{"Content-Type","Authorization"},
+}))
+	router.Use(middleware.RateLimit())
 
-	router.Use(func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(http.StatusNoContent)
-			return
-		}
-
-		c.Next()
-	})
 
 	api := router.Group("/api/v1")
 
