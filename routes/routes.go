@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"strings"
 	"to-the-other-me/internal/handler"
 	"to-the-other-me/internal/middleware"
 
@@ -18,10 +19,9 @@ func RegisterRoutes(
 	letterHandler *handler.LetterHandler,
 ) {
 	frontendURL := os.Getenv("FRONTEND_URL")
+	origins := strings.Split(frontendURL, ",")
 	router.Use(cors.New(cors.Config{
-	AllowOrigins: []string{
-		frontendURL,
-	},
+	AllowOrigins:origins,
 	AllowMethods: []string{"GET", "POST","OPTIONS"},
 	AllowHeaders: []string{"Content-Type","Authorization"},
 }))
